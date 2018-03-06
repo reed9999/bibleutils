@@ -14,12 +14,6 @@ def step_impl(context):
     context.app = BibleUtilsApp.get_instance()
     Q_MATTHEW_5 = "Matthew 5"
     context.app.request(Q_MATTHEW_5)
-    return
-
-    key = read_key_from_file()
-    #This looks like implementation details that shouldn't be in the behavioral test.
-    html = issue_rest_request(key, q)
-    headings = process_passage_html(html)
 
 
 

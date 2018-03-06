@@ -6,3 +6,7 @@ Feature: Parse headings from arbitrary passage
 
   When I ask for the subject headings from Matthew 5
     Then I should get a sequence containing Sermon on the Mount, the Beatitudes, etc.
+
+  Scenario: Code base is solid at the unit-test level
+
+    Then Unit tests pass
