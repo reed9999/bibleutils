@@ -3,8 +3,9 @@
 #because I don't like having every method be a passthrough to the inner class.
 
 from yaml import load, dump
-import csv, re, datetime
+import csv, re, datetime, requests
 
+ESV_URL = 'https://api.esv.org/v3/passage/html/'
 class BibleUtilsApp(object):
     __api_key = None
     __instance = None
@@ -12,17 +13,24 @@ class BibleUtilsApp(object):
     def __init__(self):
         pass
 
+    #I wrongly had this as a singleton. If we had two different app instances (i.e. didn't use get_instance()) then we
+    # might want them to have two different user accounts hence two keys.
+    def api_key(self):
+        if not self.__api_key:
+            self.__api_key = self.read_key_from_file()
+        return self.__api_key
+
     @classmethod
-    def api_key(cls):
-        if not cls.__api_key:
-            cls.__api_key = cls.read_key_from_file()
-        return cls.__api_key
+    def issue_rest_request(cls, key, q):
+
+        json = requests.get("{}?q={}".format(ESV_URL, q), headers={'Authorization': 'Token {}'.format(key)})
+        return json
+
+
 
     def request(self, q):
-
-        print(self.api_key())
-        html = issue_rest_request(self.api_key(), q)
-        headings = process_passage_html(html)
+        json = self.__class__.issue_rest_request(self.api_key(), q).content
+        headings = self.__class__.process_passage_json(json)
         return headings
 
     @classmethod
@@ -36,8 +44,13 @@ class BibleUtilsApp(object):
         HARDCODED_FILENAME = "__key.txt"
         with open(HARDCODED_FILENAME, 'r') as key_file:
             _ = key_file.readline()
-            key = key_file.readline()
+            key = key_file.readline()[:-1]
         return key
+
+    @classmethod
+    def process_passage_json(cls, json):
+        print ("Here's the json" + json)
+        pass
 
 
 def singleton_demo():
