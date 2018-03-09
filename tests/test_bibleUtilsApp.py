@@ -22,10 +22,11 @@ class TestBibleUtilsApp(TestCase):
         r2 = self.app.request(q)
         q = "Gen 1:17-25"
         r3 = self.app.request(q)
-        assert type(r1) == float
-        assert r1 == "In the arxe was the logos"
-        assert r2 == "some prayer"
-        assert r3 == "a great verse"
+        assert isinstance(r1[0], str)
+        only = 0
+        assert "<h2 class=" == r1[only][0:10]
+        assert "<h2 class=" == r2[only][0:10]
+        assert "<h2 class=" == r3[only][0:10]
 
     def test_get_instance(self):
         self.skipTest("NYI")

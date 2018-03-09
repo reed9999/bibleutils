@@ -3,7 +3,7 @@
 #because I don't like having every method be a passthrough to the inner class.
 
 from yaml import load, dump
-import csv, re, datetime, requests
+import csv, re, datetime, requests, json
 
 ESV_URL = 'https://api.esv.org/v3/passage/html/'
 class BibleUtilsApp(object):
@@ -29,8 +29,9 @@ class BibleUtilsApp(object):
 
 
     def request(self, q):
-        json = self.__class__.issue_rest_request(self.api_key(), q).content
-        headings = self.__class__.process_passage_json(json)
+        json_bytes = self.__class__.issue_rest_request(self.api_key(), q).content
+        json_str = json_bytes.decode('utf-8')
+        headings = self.__class__.process_passage_json(json_str)
         return headings
 
     @classmethod
@@ -48,9 +49,9 @@ class BibleUtilsApp(object):
         return key
 
     @classmethod
-    def process_passage_json(cls, json):
-        print ("Here's the json" + json)
-        pass
+    def process_passage_json(cls, json_str):
+        the_json = json.loads(json_str)
+        return the_json['passages']
 
 
 def singleton_demo():
