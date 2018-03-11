@@ -28,9 +28,17 @@ class TestBibleUtilsApp(TestCase):
         assert "<h2 class=" == r2[only][0:10]
         assert "<h2 class=" == r3[only][0:10]
 
-    def test_get_instance(self):
-        self.skipTest("NYI")
+    def test_headings(self):
+        q = "John 1"
+        headings = self.app.headings(q)
+        assert "The Word Became Flesh" == headings[0]
+        assert "The Testimony of John the Baptist" == headings[1]
 
-    def test_read_key_from_file(self):
-        self.skipTest("NYI")
+    def test_get_instance(self):
+        i1 = BibleUtilsApp.get_instance()
+        i2 = BibleUtilsApp.get_instance()
+        assert True == (i1==i2)
+        i3 = BibleUtilsApp()
+        assert False == (i1 == i3)
+        assert False == (i2 == i3)
 

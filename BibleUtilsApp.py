@@ -4,6 +4,7 @@
 
 from yaml import load, dump
 import csv, re, datetime, requests, json
+from bs4 import BeautifulSoup
 
 ESV_URL = 'https://api.esv.org/v3/passage/html/'
 class BibleUtilsApp(object):
@@ -26,13 +27,17 @@ class BibleUtilsApp(object):
         json = requests.get("{}?q={}".format(ESV_URL, q), headers={'Authorization': 'Token {}'.format(key)})
         return json
 
-
+    def headings(self, q):
+        list_of_dicts = self.request(q)
+        if len(list_of_dicts) > 1:
+            raise RuntimeError("Multiple queries per request not handled yet. Len: {}".format(len(list_of_dicts)))
+        return self.__class__.headings_from_html(list_of_dicts[0])
 
     def request(self, q):
         json_bytes = self.__class__.issue_rest_request(self.api_key(), q).content
         json_str = json_bytes.decode('utf-8')
-        headings = self.__class__.process_passage_json(json_str)
-        return headings
+        list_of_dicts = self.__class__.process_passage_json(json_str)
+        return list_of_dicts
 
     @classmethod
     def get_instance(cls):
@@ -53,17 +58,10 @@ class BibleUtilsApp(object):
         the_json = json.loads(json_str)
         return the_json['passages']
 
-
-def singleton_demo():
-    i1 = BibleUtilsApp.get_instance()
-    print (i1)
-    i2 = BibleUtilsApp.get_instance()
-    print (i2)
-    print (i1==i2)
-    i3 = BibleUtilsApp()
-    print (i3)
-    print(i1 == i3)
-    print(i2 == i3)
+    @classmethod
+    def headings_from_html(cls, html):
+        soup = BeautifulSoup(html, "html5lib")
+        return [h3_tag.contents[0] for h3_tag in soup.find_all('h3')]
 
 if __name__ == "__main__":
-    singleton_demo()
+    instance = BibleUtilsApp.get_instance()
