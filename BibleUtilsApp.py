@@ -2,8 +2,10 @@
 # http://python-3-patterns-idioms-test.readthedocs.io/en/latest/Singleton.html
 #because I don't like having every method be a passthrough to the inner class.
 
-from yaml import load, dump
-import csv, re, datetime, requests, json
+#from yaml import load, dump
+#import csv, re, datetime, requests, json
+import requests
+import json
 from bs4 import BeautifulSoup
 
 ESV_URL = 'https://api.esv.org/v3/passage/html/'
@@ -11,8 +13,8 @@ class BibleUtilsApp(object):
     __api_key = None
     __instance = None
 
-    def __init__(self):
-        pass
+    def __init__(self, output_file=None):
+        self.output_file = output_file
 
     #I wrongly had this as a singleton. If we had two different app instances (i.e. didn't use get_instance()) then we
     # might want them to have two different user accounts hence two keys.
@@ -38,6 +40,13 @@ class BibleUtilsApp(object):
         json_str = json_bytes.decode('utf-8')
         list_of_dicts = self.__class__.process_passage_json(json_str)
         return list_of_dicts
+
+    def write_headings(self, q, param_fn=None):
+        default_fn = "/home/philip/Documents/bible/bible-headings.md"
+        fn = param_fn or (self.output_file or default_fn)
+        headings = self.headings(q)
+        with open(fn, 'a') as f:
+            f.writelines(map(lambda x: x + '\n', headings))
 
     @classmethod
     def get_instance(cls):

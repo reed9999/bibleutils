@@ -13,6 +13,12 @@ Feature: Parse headings from arbitrary ESV passage
   When I ask for the subject headings from the first half of Matthew, Mark, Luke, John, Acts, and Obadiah
     Then I should get the right headings for the first half of Matthew, Mark, Luke, John, Acts, and Obadiah
 
+  Scenario: Retrieve Numbers by halves
+
+  When I ask for the subject headings from Numbers first half then second half
+    Then I should get the right headings for Numbers
+    And The verses should not be cached.
+
 #  Scenario: Code base is solid at the unit-test level
 #
 #    Then Unit tests pass
